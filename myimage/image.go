@@ -1,4 +1,4 @@
-package main
+package myimage
 
 import (
 	"fmt"

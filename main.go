@@ -4,6 +4,8 @@ import (
 	"flag"
 	"os"
 	"path/filepath"
+
+	"go_training/imgconv/myimage"
 )
 
 var root = flag.String("dir", "", "ディレクトリ") // ディレクトリの指定
@@ -13,7 +15,7 @@ var bf = flag.String("b", ".jpg", "変換前の形式") // 変換前の画像形
 // 画像変換する
 var reconv = func(path string, info os.FileInfo, err error) error {
 	if filepath.Ext(path) == *bf {
-		i := NewImage(path)
+		i := myimage.NewImage(path)
 
 		switch i.GetExt() {
 		case ".jpg":

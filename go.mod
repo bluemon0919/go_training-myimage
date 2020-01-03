@@ -1,3 +1,3 @@
-module imgconv
+module go_training/imgconv
 
-go 1.12
+go 1.13
