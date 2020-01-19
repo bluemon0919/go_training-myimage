@@ -14,16 +14,27 @@ var beforeFormat string // 変換前の画像形式
 
 // 画像変換する
 var reconv = func(path string, info os.FileInfo, err error) error {
-	if filepath.Ext(path) == beforeFormat {
-		i := myimage.NewImage(path)
+	if filepath.Ext(path) != beforeFormat {
+		return nil
+	}
 
-		switch afterFormat {
-		case ".png":
-			i.ConvertToPNG()
-		case ".jpg":
-			i.ConvertToJPG()
-		}
-		i.Remove()
+	i, err := myimage.NewImage(path)
+	if err != nil {
+		return err
+	}
+
+	switch afterFormat {
+	case ".png":
+		err = i.ConvertToPNG()
+	case ".jpg":
+		err = i.ConvertToJPG()
+	}
+	if err != nil {
+		return err
+	}
+
+	if err := i.Remove(); err != nil {
+		return err
 	}
 	return nil
 }

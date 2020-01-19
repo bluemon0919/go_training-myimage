@@ -1,11 +1,9 @@
 package myimage
 
 import (
-	"fmt"
 	"image"
 	"image/jpeg"
 	"image/png"
-	"log"
 	"os"
 	"path/filepath"
 	"strings"
@@ -25,11 +23,11 @@ type MyImage struct {
 }
 
 // NewImage creates a new image object.
-func NewImage(path string) MyImage {
+func NewImage(path string) (*MyImage, error) {
 	dir, name, ext := exceptExt(path)
 	r, err := os.Open(path)
 	if err != nil {
-		log.Fatal(err)
+		return nil, err
 	}
 	defer r.Close()
 
@@ -41,17 +39,17 @@ func NewImage(path string) MyImage {
 		m, err = png.Decode(r)
 	}
 	if err != nil {
-		log.Fatal(err)
+		return nil, err
 	}
 
-	return MyImage{
+	return &MyImage{
 		data: m,
 		file: myFile{
 			path: dir,
 			name: name,
 			ext:  ext,
 		},
-	}
+	}, nil
 }
 
 // originalFile gets original file path.
@@ -66,44 +64,46 @@ func (i *MyImage) GetExt() string {
 
 // ConvertToPNG converts original image to PNG format.
 // The original image is not deleted.
-func (i *MyImage) ConvertToPNG() {
+func (i *MyImage) ConvertToPNG() error {
 	// 変換後の画像ファイルを作る
 	path := filepath.Join(i.file.path, i.file.name+".png")
 	w, err := os.Create(path)
 	if err != nil {
-		log.Fatal(err)
+		return err
 	}
 	defer w.Close()
 
 	if err := png.Encode(w, i.data); err != nil {
-		log.Fatal(err)
+		return err
 	}
+	return nil
 }
 
 // ConvertToJPG converts original image to JPG format.
 // The original image is not deleted.
-func (i *MyImage) ConvertToJPG() {
+func (i *MyImage) ConvertToJPG() error {
 	// 変換後の画像ファイルを作る
 	path := filepath.Join(i.file.path, i.file.name+".jpg")
 	w, err := os.Create(path)
 	if err != nil {
-		log.Fatal(err)
+		return err
 	}
 	defer w.Close()
 
 	opts := &jpeg.Options{Quality: 100}
 	if err := jpeg.Encode(w, i.data, opts); err != nil {
-		log.Fatal(err)
+		return err
 	}
+	return nil
 }
 
 // Remove remove origial file.
-func (i *MyImage) Remove() {
-	fmt.Println(i.originalFile())
+func (i *MyImage) Remove() error {
 	err := os.Remove(i.originalFile())
 	if err != nil {
-		log.Fatal(err)
+		return err
 	}
+	return nil
 }
 
 func exceptExt(filename string) (string, string, string) {
