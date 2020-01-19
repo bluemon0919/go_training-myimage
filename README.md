@@ -9,5 +9,5 @@ ImageConvcerter converts from the original image format to another image format.
 
 ```
 
-./imgconv [-a after_format] [-b before_format] [-dir search_directory]
+./imgconv <search_dir> <after_format> <before_format>
 ```

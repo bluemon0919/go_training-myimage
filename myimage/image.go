@@ -113,3 +113,13 @@ func exceptExt(filename string) (string, string, string) {
 	name := strings.Split(tmp, ext)
 	return dir, name[0], ext
 }
+
+// IsFormat returns whether the format is supported
+func IsFormat(f string) bool {
+	switch f {
+	case ".jpg", ".png":
+		return true
+	default:
+		return false
+	}
+}
