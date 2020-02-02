@@ -13,7 +13,7 @@ var afterFormat string  // 変換後の画像形式
 var beforeFormat string // 変換前の画像形式
 
 // 画像変換する
-var reconv = func(path string, info os.FileInfo, err error) error {
+func convert(path string, info os.FileInfo, err error) error {
 	if filepath.Ext(path) != beforeFormat {
 		return nil
 	}
@@ -28,12 +28,14 @@ var reconv = func(path string, info os.FileInfo, err error) error {
 		err = c.ToPNG()
 	case ".jpg":
 		err = c.ToJPG()
+	default:
+		err = fmt.Errorf("after format is not supported")
 	}
 	if err != nil {
 		return err
 	}
 
-	if err := c.OriginalRemove(); err != nil {
+	if err := c.RemoveOriginal(); err != nil {
 		return err
 	}
 	return nil
@@ -74,7 +76,7 @@ func main() {
 	beforeFormat = args[1]
 	afterFormat = args[2]
 
-	if err := filepath.Walk(args[0], reconv); err != nil {
+	if err := filepath.Walk(args[0], convert); err != nil {
 		fmt.Println(err)
 	}
 }

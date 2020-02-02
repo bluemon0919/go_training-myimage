@@ -1,12 +1,12 @@
 package imageConverter
 
 import (
+	"fmt"
 	"image"
 	"image/jpeg"
 	"image/png"
 	"os"
 	"path/filepath"
-	"strings"
 )
 
 // original is original file information.
@@ -37,6 +37,8 @@ func New(path string) (*ImageConverter, error) {
 		m, err = jpeg.Decode(r)
 	case ".png":
 		m, err = png.Decode(r)
+	default:
+		err = fmt.Errorf("format is not supported")
 	}
 	if err != nil {
 		return nil, err
@@ -92,8 +94,8 @@ func (i *ImageConverter) ToJPG() error {
 	return nil
 }
 
-// OriginalRemove remove origial file.
-func (i *ImageConverter) OriginalRemove() error {
+// RemoveOriginal remove origial file.
+func (i *ImageConverter) RemoveOriginal() error {
 	err := os.Remove(i.originalFile())
 	if err != nil {
 		return err
@@ -101,12 +103,12 @@ func (i *ImageConverter) OriginalRemove() error {
 	return nil
 }
 
-func exceptExt(filename string) (string, string, string) {
-	dir := filepath.Dir(filename)
-	tmp := filepath.Base(filename)
-	ext := filepath.Ext(filename)
-	name := strings.Split(tmp, ext)
-	return dir, name[0], ext
+func exceptExt(path string) (dir string, name string, ext string) {
+	dir = filepath.Dir(path)
+	filename := filepath.Base(path)
+	ext = filepath.Ext(path)
+	name = filename[:len(ext)+1]
+	return dir, name, ext
 }
 
 // IsFormat returns whether the format is supported
