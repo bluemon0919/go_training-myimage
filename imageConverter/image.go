@@ -1,4 +1,4 @@
-package myimage
+package imageConverter
 
 import (
 	"image"
@@ -9,21 +9,21 @@ import (
 	"strings"
 )
 
-// myFile is file information.
-type myFile struct {
+// original is original file information.
+type original struct {
 	path string // ファイル名を除くパス
 	name string // 拡張子を除くファイル名
 	ext  string // 拡張子
 }
 
-// MyImage is image object.
-type MyImage struct {
+// ImageConverter is image object.
+type ImageConverter struct {
 	data image.Image // デコードした画像データ
-	file myFile      // ファイル名情報
+	org  original    // 元ファイル情報
 }
 
-// NewImage creates a new image object.
-func NewImage(path string) (*MyImage, error) {
+// New creates a new image object.
+func New(path string) (*ImageConverter, error) {
 	dir, name, ext := exceptExt(path)
 	r, err := os.Open(path)
 	if err != nil {
@@ -42,9 +42,9 @@ func NewImage(path string) (*MyImage, error) {
 		return nil, err
 	}
 
-	return &MyImage{
+	return &ImageConverter{
 		data: m,
-		file: myFile{
+		org: original{
 			path: dir,
 			name: name,
 			ext:  ext,
@@ -53,20 +53,15 @@ func NewImage(path string) (*MyImage, error) {
 }
 
 // originalFile gets original file path.
-func (i *MyImage) originalFile() string {
-	return filepath.Join(i.file.path, i.file.name+i.file.ext)
+func (i *ImageConverter) originalFile() string {
+	return filepath.Join(i.org.path, i.org.name+i.org.ext)
 }
 
-// GetExt gets extension
-func (i *MyImage) GetExt() string {
-	return i.file.ext
-}
-
-// ConvertToPNG converts original image to PNG format.
+// ToPNG converts original image to PNG format.
 // The original image is not deleted.
-func (i *MyImage) ConvertToPNG() error {
+func (i *ImageConverter) ToPNG() error {
 	// 変換後の画像ファイルを作る
-	path := filepath.Join(i.file.path, i.file.name+".png")
+	path := filepath.Join(i.org.path, i.org.name+".png")
 	w, err := os.Create(path)
 	if err != nil {
 		return err
@@ -79,11 +74,11 @@ func (i *MyImage) ConvertToPNG() error {
 	return nil
 }
 
-// ConvertToJPG converts original image to JPG format.
+// ToJPG converts original image to JPG format.
 // The original image is not deleted.
-func (i *MyImage) ConvertToJPG() error {
+func (i *ImageConverter) ToJPG() error {
 	// 変換後の画像ファイルを作る
-	path := filepath.Join(i.file.path, i.file.name+".jpg")
+	path := filepath.Join(i.org.path, i.org.name+".jpg")
 	w, err := os.Create(path)
 	if err != nil {
 		return err
@@ -97,8 +92,8 @@ func (i *MyImage) ConvertToJPG() error {
 	return nil
 }
 
-// Remove remove origial file.
-func (i *MyImage) Remove() error {
+// OriginalRemove remove origial file.
+func (i *ImageConverter) OriginalRemove() error {
 	err := os.Remove(i.originalFile())
 	if err != nil {
 		return err

@@ -6,7 +6,7 @@ import (
 	"os"
 	"path/filepath"
 
-	"go_training-myimage/myimage"
+	"go_training-myimage/imageConverter"
 )
 
 var afterFormat string  // 変換後の画像形式
@@ -18,27 +18,28 @@ var reconv = func(path string, info os.FileInfo, err error) error {
 		return nil
 	}
 
-	i, err := myimage.NewImage(path)
+	c, err := imageConverter.New(path)
 	if err != nil {
 		return err
 	}
 
 	switch afterFormat {
 	case ".png":
-		err = i.ConvertToPNG()
+		err = c.ToPNG()
 	case ".jpg":
-		err = i.ConvertToJPG()
+		err = c.ToJPG()
 	}
 	if err != nil {
 		return err
 	}
 
-	if err := i.Remove(); err != nil {
+	if err := c.OriginalRemove(); err != nil {
 		return err
 	}
 	return nil
 }
 
+// argsCheck checks that the arguments are correct
 func argsCheck(args []string) error {
 	// パラメータ数が一致することを確認する
 	if 3 != len(args) {
@@ -52,10 +53,10 @@ func argsCheck(args []string) error {
 	}
 
 	// <after_format>, <before_format>に指定された画像フォーマットが対応しているか確認する
-	if !myimage.IsFormat(args[1]) {
+	if !imageConverter.IsFormat(args[1]) {
 		return fmt.Errorf("%sは使用できるフォーマットではありません", args[1])
 	}
-	if !myimage.IsFormat(args[2]) {
+	if !imageConverter.IsFormat(args[2]) {
 		return fmt.Errorf("%sは使用できるフォーマットではありません", args[2])
 	}
 	return nil
